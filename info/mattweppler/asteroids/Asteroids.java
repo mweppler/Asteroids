@@ -264,6 +264,137 @@ public class Asteroids {
 	/****************************************************
 	 * Update the asteroids based on velocity
 	 ***************************************************/
-  // page 67...
+  public void updateAsteroids() {
+    //move and rotate the asteroids
+    for (int n = 0; n < ASTEROIDS; n++) {
+      //is this asteroid being used?
+      if (ast[n].isAlive()) {
+        //update the asteroid's X value
+        ast[n].incX(ast[n].getVelX());
+        //warp the asteroid at screen edges
+        if (ast[n].getX() < -20) {
+          ast[n].setX(getSize().width + 20);
+        } else if (ast[n].getX() > getSize().width + 20) {
+          ast[n].setX(-20);
+        }
+        //update the asteroid's Y value
+        ast[n].incY(ast[n].getVelY());
+        //warp the asteroid at screen edges
+        if (ast[n].getY() < -20) {
+          ast[n].setY(getSize().height + 20);
+        } else if (ast[n].getY() > getSize().height + 20) {
+          ast[n].setY(-20);
+        }
+        //update the asteroid's rotation
+        ast[n].incMoveAngle(ast[n].getRotationVelocity());
+        //keep the angle within 0-359 degrees
+        if (ast[n].getMoveAngle() < 0) {
+          ast[n].setMoveAngle(360 - ast[n].getRotationVelocity());
+        } else if (ast[n].getMoveAngle() > 360) {
+          ast[n].setMoveAngle(ast[n].getRotationVelocity());
+        }
+      }
+    }
+  }
+
+	/****************************************************
+	 * Test asteroids for collisions with ship or bullets
+	 ***************************************************/
+  public void checkCollisions() {
+    //iterate through the asteroids array
+    for (int m = 0; m < ASTEROIDS; m++) {
+      //is this asteroid being used?
+      if (ast[m].isAlive()) {
+         //check for collision with bullet
+         for (int n = 0; n < BULLETS; n++) {
+           //is this bullet being used?
+           if (bullet[n].isAlive()) {
+             //perform the collision test
+             if (ast[m].getBounds().contains(bullet[n].getX(), bullet[n].getY())) {
+               bullet[n].setAlive(false);
+               ast[m].setAlive(false);
+               continue;
+             }
+           }
+         }
+         //check for collision with ship
+         if (ast[m].getBounds().intersects(ship.getBounds())) {
+           ast[m].setAlive(false);
+           ship.setX(320);
+           ship.setY(240);
+           ship.setFaceAngle(0);
+           ship.setVelX(0);
+           ship.setVelY(0);
+           continue;
+         }
+      }
+    }
+  }
+
+	/****************************************************
+	 * key listener events
+	 ***************************************************/
+	public void keyReleased(KeyEvent k) {}
+	public void keyTyped(KeyEvent k) {}
+	public void keyPressed(KeyEvent k) {
+	  int keyCode = k.getKeyCode();
+	  switch (keyCode) {
+	    case KeyEvent.VK_LEFT:
+	      //left arrow rotates ship left 5 degrees
+	      ship.incFaceAngle(-5);
+	      if (ship.getFaceAngle() < 0) {
+	        ship.setFaceAngle(360 - 5);
+	      }
+	      break;
+	    case KeyEvent.VK_RIGHT:
+	      //right arrow rotates ship right 5 degrees
+	      ship.incFaceAngle(5);
+	      if (ship.getFaceAngle() > 360) {
+	        ship.setFaceAngle(5);
+	      }
+	      break;
+	    case KeyEvent.VK_UP:
+	      //up arrow adds thrust to ship (1/10 normal speed)
+	      ship.setMoveAngle(ship.getFaceAngle() - 90);
+	      ship.incVelX(calcAngleMoveX(ship.getMoveAngle()) * 0.1);
+	      ship.incVelY(calcAngleMoveY(ship.getMoveAngle()) * 0.1);
+	      break;
+	    //Ctrl, Enter, or Space can be used to fire weapon
+	    case KeyEvent.VK_CONTROL:
+	    case KeyEvent.VK_ENTER:
+	    case KeyEvent.VK_SPACE:
+	      //fire a bullet
+	      currentBullet++;
+	      if (currentBullet > BULLETS - 1) {
+	        currentBullet = 0;
+	      }
+	      bullet[currentBullet].setAlive(true);
+	      //point bullet in same direction ship is facing
+	      bullet[currentbullet]setX(ship.getX());
+	      bullet[currentbullet]setY(ship.getY());
+	      bullet[currentbullet]setMoveAngle(ship.getFaceAngle() - 90);
+	      //fire bullet at angle of the ship
+	      double angle = bullet[currentBullet].getMoveAngle();
+	      double svx = ship.getVelX();
+	      double svy = ship.getVelY();
+	      bullet[currentBullet].setVelX(svx + calcAngleMoveX(angle) * 2);
+	      bullet[currentBullet].setVelY(svy + calcAngleMoveY(angle) * 2);
+	      break;
+	  }
+	}
+
+	/****************************************************
+	 * calculate X movement value based on direction angle
+	 ***************************************************/
+	public double calcAngleMoveX(double angle) {
+	  return (double) (Math.cos(angle * Math.PI / 180));
+	}
+
+	/****************************************************
+	 * calculate Y movement value based on direction angle
+	 ***************************************************/
+	public double calcAngleMoveY(double angle) {
+	  return (double) (Math.sin(angle * Math.PI / 180));
+	}
 
 }
