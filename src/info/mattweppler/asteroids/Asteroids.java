@@ -12,18 +12,21 @@ package info.mattweppler.asteroids;
  * Chapter 3 - ASTEROIDS GAME
  ***************************************************/
 
-import java.applet.*;
-import java.awt.*;
-import java.awt.event.*;
-import java.awt.geom.*;
-import java.awt.image.*;
-import java.util.*;
+import java.applet.Applet;
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.awt.geom.AffineTransform;
+import java.awt.image.BufferedImage;
+import java.util.Random;
 
 /****************************************************
  * Primary class for the game
  ***************************************************/
 
-public class Asteroids {
+public class Asteroids extends Applet implements Runnable, KeyListener {
 
 	//the main thread becomes the game loop
 	Thread gameloop;
@@ -152,7 +155,7 @@ public class Asteroids {
       if (ast[n].isAlive()) {
         //draw the asteroid
         g2d.setTransform(identity);
-        g2d.translate(ast[n].getX(), ast[n].getY())
+        g2d.translate(ast[n].getX(), ast[n].getY());
         g2d.rotate(Math.toRadians(ast[n].getMoveAngle()));
         g2d.setColor(Color.DARK_GRAY);
         g2d.fill(ast[n].getShape());
@@ -161,15 +164,15 @@ public class Asteroids {
   }
 
 	/****************************************************
-	 * Applet window repaint event - - draw the back buffer
+	 * ppplet window repaint event - - draw the back buffer
 	 ***************************************************/
   public void paint(Graphics g) {
     //draw the back buffer onto the applet window
-    g.drawImage(backBuffer, 0, 0, this);
+    g.drawImage(backbuffer, 0, 0, this);
   }
   
 	/****************************************************
-	 * Thread start event - start the game loop running
+	 * thread start event - start the game loop running
 	 ***************************************************/
   public void start() {
     //create the gameloop thread for real - time updates
@@ -178,7 +181,7 @@ public class Asteroids {
   }
   
 	/****************************************************
-	 * Thread run event (game loop)
+	 * thread run event (game loop)
 	 ***************************************************/
 	public void run() {
 	  //acquire the current thread
@@ -191,7 +194,7 @@ public class Asteroids {
 	      //target framerate is 50 fps
 	      Thread.sleep(20);
 	    } catch (InterruptedException ie) {
-	      id.printStackTrace();
+	      ie.printStackTrace();
 	    }
 	    repaint();
 	  }
@@ -232,7 +235,7 @@ public class Asteroids {
     //wrap around top/bottom
     if (ship.getY() < -10) {
       ship.setY(getSize().height + 10);
-    } else if (ship.getY > getSize().height + 10) {
+    } else if (ship.getY() > getSize().height + 10) {
       ship.setY(-10);
     }
   }
@@ -370,9 +373,9 @@ public class Asteroids {
 	      }
 	      bullet[currentBullet].setAlive(true);
 	      //point bullet in same direction ship is facing
-	      bullet[currentbullet]setX(ship.getX());
-	      bullet[currentbullet]setY(ship.getY());
-	      bullet[currentbullet]setMoveAngle(ship.getFaceAngle() - 90);
+	      bullet[currentBullet].setX(ship.getX());
+	      bullet[currentBullet].setY(ship.getY());
+	      bullet[currentBullet].setMoveAngle(ship.getFaceAngle() - 90);
 	      //fire bullet at angle of the ship
 	      double angle = bullet[currentBullet].getMoveAngle();
 	      double svx = ship.getVelX();
